@@ -29,12 +29,20 @@ class DatabaseConnection:
             return True
         return False
 
-    def fetch_all(self, table, condition = "ORDER BY id DESC"):
+    def fetch_all(self, table, condition="ORDER BY id DESC"):
         select_query = "SELECT * FROM {} {}".format(table, condition)
         self.cursor.execute(select_query)
         total_results = self.cursor.fetchall()
         if total_results:
-            return total_results   
+            return total_results
+        return None
+
+    def fetch_one(self, table, condition="ORDER BY id DESC"):
+        select_query = "SELECT * FROM {} {}".format(table, condition)
+        self.cursor.execute(select_query)
+        total_results = self.cursor.fetchone()
+        if total_results:
+            return total_results
         return None
 
     def fetch_last_id(self):
@@ -56,7 +64,7 @@ class DatabaseConnection:
 
 db = DatabaseConnection()
 # db.drop_tables()
-# db.create_tables()
+db.create_tables()
 # db.insert_record("requests","(userid,request_type,request_title,request_body,request_date)",
 # (1,'fsd','werewr','ewrwrrer','qweqwq') )
 # db.insert_record("requests","(userid,request_type,request_title,request_body,request_date)",

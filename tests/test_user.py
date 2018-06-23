@@ -19,3 +19,13 @@ class TestUser(BaseTestCase):
         self.assertEqual(
             dup_response_data['message'], "user already registered")
         self.assertEqual(dup_response.status_code, 409)
+
+    def test_user_can_login(self):
+        """ test registered user can login """
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        lg_response = self.login_user("ssewilliam", "password")
+        lg_response_data = json.loads(lg_response.data.decode())
+        self.assertEqual(
+            lg_response_data['message'], "user logged in successfully")
+        self.assertEqual(lg_response.status_code, 200)
