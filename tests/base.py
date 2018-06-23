@@ -15,7 +15,8 @@ class BaseTestCase(unittest.TestCase):
         """ This is the requests test predifined values """
 
         self.client = app.test_client()
-
+        self.app_context = app.test_request_context()
+        self.app_context.push()
         db.create_tables()
 
     def tearDown(self):
@@ -26,14 +27,14 @@ class BaseTestCase(unittest.TestCase):
         """ use to register a demo user """
 
         return self.client.post(
-            '/api/v1/auth/signup', data=json.dumps(dict(username=username, email=email, password=password)), content_type='application/json')
+            url_for('register'), data=json.dumps(dict(username=username, email=email, password=password)), content_type='application/json')
 
     def login_user(self, username, password):
         """ use to login registered users """
         self.demo_user = {
-            'username':username,
-            'password':password
+            'username': username,
+            'password': password
         }
 
         return self.client.post(
-            '/api/v1/auth/login', data=json.dumps(self.demo_user),  headers={'Authorization': 'Basic c3Nld2lsbGlhbTpwYXNzd29yZA =='})
+            url_for('login'), data=json.dumps(self.demo_user),  headers={'Authorization': 'Basic c3Nld2lsbGlhbTpwYXNzd29yZA =='})

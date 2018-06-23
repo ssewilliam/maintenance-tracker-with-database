@@ -3,7 +3,7 @@ from app.models import Users
 from pprint import pprint
 
 @app.route("/api/v1/auth/signup", methods=['POST'])
-def register_user():
+def register():
     if not request.json:
         return jsonify({
             "message": "invalid request"
@@ -47,7 +47,7 @@ def register_user():
 
 
 @app.route("/api/v1/auth/login", methods=['POST'])
-def login_user():
+def login():
     auth = request.authorization
     if not auth:
         return jsonify({
