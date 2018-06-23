@@ -19,3 +19,9 @@ class BaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         db.drop_tables()
+
+    def register_user(self, username, email, password):
+        """ use to register a demo user """
+
+        return self.client.post(
+        '/api/v1/auth/signup', data=json.dumps(dict(username=username, email=email, password=password)), content_type='application/json')
