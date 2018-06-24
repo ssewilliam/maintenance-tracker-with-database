@@ -20,7 +20,7 @@ class DatabaseConnection:
         request_table = "CREATE TABLE IF NOT EXISTS requests (id serial PRIMARY KEY, userid int, request_type varchar(25),request_title varchar(500), request_body varchar(500), request_date varchar(50))"
         self.cursor.execute(users_table)
         self.cursor.execute(request_table)
-        pprint("Tables created successfully")
+        # pprint("Tables created successfully")
 
     def insert_record(self, table, *args):
         insert_query = "INSERT INTO {} {} VALUES {}".format(
@@ -59,7 +59,7 @@ class DatabaseConnection:
         drop_requests = "DROP TABLE requests"
         self.cursor.execute(drop_users)
         self.cursor.execute(drop_requests)
-        pprint("Dropped tables successfully")
+        # pprint("Dropped tables successfully")
 
 
 db = DatabaseConnection()

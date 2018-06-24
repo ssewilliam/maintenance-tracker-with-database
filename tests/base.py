@@ -21,7 +21,6 @@ class BaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         db.drop_tables()
-        # pass
 
     def register_user(self, username, email, password):
         """ use to register a demo user """
@@ -38,3 +37,22 @@ class BaseTestCase(unittest.TestCase):
 
         return self.client.post(
             url_for('login'), data=json.dumps(self.demo_user),  headers={'Authorization': 'Basic c3Nld2lsbGlhbTpwYXNzd29yZA =='})
+
+    def post(self, token, r_title, r_type, r_body):
+        """ use to post a request for alogged in user """
+
+        self.request_data = {
+            'title': r_title,
+            'type': r_type,
+            'description': r_body
+        }
+
+        return self.client.post(
+            url_for('create_request'), data=json.dumps(self.request_data), content_type='application/json', headers=({"token": token}))
+
+    def get_token(self):
+        """ use to get token after login """
+
+        response = self.login_user("ssewilliam", "password")
+        token_data = json.loads(response.data.decode())
+        return token_data['token']

@@ -23,3 +23,13 @@ class Users(DatabaseConnection):
         if result:
             return result
         return False
+
+class Requests(DatabaseConnection):
+    __table__ = "requests"
+
+    def post_request(self, r_type, r_title, r_description, r_date):
+        result = self.insert_record(self.__table__, "(request_type, request_title, request_body, request_date)",
+                                    "('"+r_type+"', '"+r_title+"', '"+r_description+"', '"+r_date+"')")
+        if result:
+            return True
+        return False

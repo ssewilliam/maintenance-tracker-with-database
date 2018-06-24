@@ -1,5 +1,5 @@
 from app import *
-from app.models import Users
+from app.models import Users, Requests
 from pprint import pprint
 
 @app.route("/api/v1/auth/signup", methods=['POST'])
@@ -89,3 +89,39 @@ def login():
     return jsonify({
         'message':'username or password doesnot match'
     }), 401
+
+
+@app.route("/api/v1/users/requests", methods=['POST'])
+def create_request():
+    if not request.json:
+        return jsonify({
+            "message":"request is invalid"
+        }), 400
+
+    if "title" not in request.json:
+        return jsonify({
+            "message": "title is missing"
+        }), 400
+
+    if "type" not in request.json:
+        return jsonify({
+            "message": "type is missing"
+        }), 400
+
+    if "description" not in request.json:
+        return jsonify({
+            "message": "body is missing"
+        }), 400
+
+    field = request.get_json()
+
+    r_type = field['type']
+    r_title = field['title']
+    r_description = field['description']
+    r_date = str(datetime.datetime.utcnow())
+    _request = Requests()
+    result = _request.post_request(r_type, r_title, r_description, r_date)
+
+    if result:
+        return jsonify({'message': 'request created successfully'}), 201
+    return jsonify({'message': 'creating request failed'}), 400
