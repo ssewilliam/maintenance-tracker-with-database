@@ -23,7 +23,7 @@ class TestRequest(BaseTestCase):
                          'request title already used')
         self.assertEqual(response.status_code, 409)
 
-    def test_user_can_get_request(self):
+    def test_user_can_get_requests(self):
         """ test if user can get created requests """
         
         self.register_user(
@@ -31,6 +31,32 @@ class TestRequest(BaseTestCase):
         token = self.get_token()    
         self.post_request(token, "fix the power button", "reapir","the laptop can turn on")
         result = self.get_requests(token)
-        result = self.client.get(
-            url_for('get_requests'), headers=({"app-access-token": token}))
         self.assertEqual(result.status_code, 200)
+
+    def test_user_get_request(self):
+        """ test if user can get created request """
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "reapir", "the laptop can turn on")
+
+        response = self.get_request(token,1)
+
+        response_data = json.loads(response.data.decode())
+        self.assertEqual(response_data['status'], 'OK')
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_can_update_requests(self):
+        """ test user can update their requests """
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "reapir", "the laptop can turn on")
+
+        result = self.update_request(
+            token, 1, "fix the power button", "repair", "the laptop can turn on or off using this button")
+        self.assertEqual(result.status_code,200)

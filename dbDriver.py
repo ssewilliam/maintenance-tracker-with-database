@@ -54,6 +54,14 @@ class DatabaseConnection:
             return row
         return row[0]
 
+    def update_record(self, table, *args):
+        update_query = "UPDATE {} SET {} WHERE {}".format(
+            table, args[0], args[1])
+        if self.cursor.execute(update_query) is None:
+            return True
+        return False
+
+
     def drop_tables(self):
         drop_users = "DROP TABLE users"
         drop_requests = "DROP TABLE requests"

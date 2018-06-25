@@ -181,3 +181,64 @@ def get_requests(current_user):
     return jsonify({
         'requests': results
     }), 200
+
+
+@app.route("/api/v1/users/requests/<int:requestId>", methods=['GET'])
+@token_required
+def get_request(current_user, requestId):
+    user_id = current_user[0]
+
+    _request = Requests()
+    _request = _request.fetch_request_by_id(user_id, requestId)
+
+    this_request = {
+        'id': _request[1],
+        'type': _request[2],
+        'title': _request[3],
+        'description': _request[4],
+        'create date':_request[5]
+    }
+    return jsonify({
+        'request': this_request,
+        'status':'OK'
+    }), 200
+
+
+@app.route("/api/v1/users/requests/<int:requestId>", methods=['PUT'])
+@token_required
+def put_request(current_user, requestId):
+    if not request.json:
+        return jsonify({
+            "message": "request is invalid"
+        }), 400
+
+    if "title" not in request.json:
+        return jsonify({
+            "message": "title is missing"
+        }), 400
+
+    if "type" not in request.json:
+        return jsonify({
+            "message": "type is missing"
+        }), 400
+
+    if "description" not in request.json:
+        return jsonify({
+            "message": "body is missing"
+        }), 400
+    field = request.get_json()
+
+    r_type = field['type']
+    r_title = field['title']
+    r_description = field['description']
+    # r_date = str(datetime.datetime.utcnow())
+    user_id = str(current_user[0])
+
+    _request = Requests()
+    result = _request.update_request(
+        user_id, r_type, r_title, r_description)
+
+
+    if result:
+        return jsonify({'message': 'request updated successfully'}), 200
+    return jsonify({'message': 'updating request failed'}), 400

@@ -58,8 +58,27 @@ class BaseTestCase(unittest.TestCase):
         token_data = json.loads(response.data.decode())
         return token_data['token']
 
-    def get_requests(self,token):
+    def get_requests(self, token):
         """ use to get requests of logged in user by using a token """
-        
+
         return self.client.get(
             url_for('get_requests'), headers=({"app-access-token": token}))
+
+    def get_request(self, token, requestId):
+        """ use to get their requests by id"""
+
+        return self.client.get(
+            url_for('get_request', requestId=requestId), headers=({"app-access-token": token}))
+
+    def update_request(self, token, requestId, r_title, r_type, r_body):
+        """ use to update user's request """
+
+        self.request_data = {
+            'title': r_title,
+            'type': r_type,
+            'description': r_body
+        }
+
+        return self.client.put(
+            url_for('put_request', requestId=requestId), data=json.dumps(self.request_data), content_type='application/json', headers=({"app-access-token": token}))
+

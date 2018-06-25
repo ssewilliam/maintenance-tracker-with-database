@@ -54,3 +54,17 @@ class Requests(DatabaseConnection):
         if result:
             return result
         return False
+
+    def fetch_request_by_id(self, user_id, request_id):
+        result = self.fetch_one(
+            self.__table__, "WHERE userid={} AND id = '{}'".format(user_id, request_id))
+        if result:
+            return result
+        return False
+
+    def update_request(self, user_id, r_type, r_title, r_description):
+        result = self.update_record(self.__table__, "request_type = '"+r_type +
+                                        "', request_title = '"+r_title+"', request_body = '"+r_description+"'"," userid = "+user_id+"")
+        if result:
+            return True
+        return False
