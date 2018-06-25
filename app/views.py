@@ -179,7 +179,9 @@ def get_requests(current_user):
         }
         results.append(this_request)
     return jsonify({
-        'requests': results
+        'requests': results,
+        'status':'OK',
+        'message':'returned successfully'
     }), 200
 
 
@@ -200,7 +202,8 @@ def get_request(current_user, requestId):
     }
     return jsonify({
         'request': this_request,
-        'status': 'OK'
+        'status': 'OK',
+        'message':'returned successfully'
     }), 200
 
 
@@ -233,10 +236,10 @@ def put_request(current_user, requestId):
     r_description = field['description']
     # r_date = str(datetime.datetime.utcnow())
     user_id = str(current_user[0])
-
+    requestId = str(requestId)
     _request = Requests()
     result = _request.update_request(
-        user_id, r_type, r_title, r_description)
+        user_id, requestId, r_type, r_title, r_description)
 
     if result:
         return jsonify({'message': 'request updated successfully'}), 200
@@ -265,11 +268,8 @@ def promote_user(current_user):
 
     user = Users()
     user_data = user.fetch_user(field['username'])
-    # pprint(user_data)
-    # pprint("user_data")
-    # pprint(user_data[0])
-    # admin_right = str(True)
     user_id = str(user_data[0])
+
     if user.modify_user(user_id):
         return jsonify({
             "message": "user promoted successfully",
@@ -304,13 +304,15 @@ def get_requests_admin(current_user):
         }
         request_list.append(this_request)
     return jsonify({
-        "requests": request_list
+        "message":"returned successfully",
+        "requests": request_list,
+        "counts":len(request_list)
     }), 200
 
 
 @app.route("/api/v1/requests/<requestId>", methods=['PUT'])
 @token_required
-def approve_request(current_user, requestId):
+def manage_request(current_user, requestId):
     is_admin = current_user[4]
     if is_admin is False:
         return jsonify({
@@ -322,6 +324,10 @@ def approve_request(current_user, requestId):
         return jsonify({
             "message": "request doesnot exist"
         }), 404
+    if not request.json:
+        return jsonify({
+            "message": "invalid request"
+        }), 400
 
     field = request.get_json()
     if field['status'] not in ("approve", "resolve", "disapprove"):

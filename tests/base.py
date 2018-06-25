@@ -12,12 +12,47 @@ from dbDriver import db
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
-        """ This is the requests test predifined values """
+        """
+        This is the requests test predifined values
+
+        set up a demo user,promote the demo user generate a token and post a sample request to
+        use in futher testing
+
+        """
 
         self.client = app.test_client()
         self.app_context = app.test_request_context()
         self.app_context.push()
         db.create_tables()
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+
+        self.token = self.get_token()
+
+        self.posted_request = self.post_request(self.token, "fix the power button",
+                          "repair", "the laptop can turn on")
+
+        self.promoted_user = self.admin_promote_user(
+            self.token, "ssewilliam", "deriwilliams2008@gmail.com")
+
+        self.disapproved_request = self.admin_manage_request(
+            self.token, "disapprove", '1')
+
+        self.resolved_request = self.admin_manage_request(
+            self.token, "resolve", '1')
+
+        self.approved_request = self.admin_manage_request(
+            self.token, "approve", '1')
+
+        self.all_requests_admin = self.admin_get_requests(self.token)
+        
+        self.all_requests = self.get_requests(self.token)
+
+        self.updated_request = self.update_request(
+            self.token, 1, "fix the power button", "repair", "the laptop can turn on or off using this button")
+        
+        self.one_request = self.get_request(self.token, '1')
 
     def tearDown(self):
         db.drop_tables()
@@ -48,8 +83,15 @@ class BaseTestCase(unittest.TestCase):
             'description': r_body
         }
 
-        return self.client.post(
+        result = self.client.post(
             url_for('create_request'), data=json.dumps(self.request_data), content_type='application/json', headers=({"app-access-token": token}))
+        result_data = json.loads(result.data.decode())
+
+        response = {
+            "message":result_data['message'],
+            'status_code':result.status_code
+        }
+        return response
 
     def get_token(self):
         """ use to get token after login """
@@ -61,14 +103,30 @@ class BaseTestCase(unittest.TestCase):
     def get_requests(self, token):
         """ use to get requests of logged in user by using a token """
 
-        return self.client.get(
-            url_for('get_requests'), headers=({"app-access-token": token}))
+        result = self.client.get(
+            url_for('get_requests'), headers=({"app-access-token": token}))    
+        result_data = json.loads(result.data.decode())
+
+        response = {
+            "message": result_data['message'],
+            "status": result_data['status'],
+            "status_code": result.status_code
+        }
+        return response
 
     def get_request(self, token, requestId):
         """ use to get their requests by id"""
 
-        return self.client.get(
+        result = self.client.get(
             url_for('get_request', requestId=requestId), headers=({"app-access-token": token}))
+        result_data = json.loads(result.data.decode())
+        
+        response = {
+            "message":result_data['message'],
+            "status":result_data['status'],
+            "status_code":result.status_code
+        }
+        return response
 
     def update_request(self, token, requestId, r_title, r_type, r_body):
         """ use to update user's request """
@@ -79,26 +137,52 @@ class BaseTestCase(unittest.TestCase):
             'description': r_body
         }
 
-        return self.client.put(
+        result = self.client.put(
             url_for('put_request', requestId=requestId), data=json.dumps(self.request_data), content_type='application/json', headers=({"app-access-token": token}))
+        result_data = json.loads(result.data.decode())
+
+        response = {
+            "message": result_data['message'],
+            "status_code": result.status_code
+        }
+
+        return response
 
     def admin_get_requests(self, token):
         """ use to get requests for admin user by using a token """
 
-        return self.client.get(
+        result = self.client.get(
             url_for('get_requests_admin'), headers=({"app-access-token": token}))
+
+        result_data = json.loads(result.data.decode())
+        response = {
+            "message": result_data['message'],
+            "status_code": result.status_code
+        }
+        return response
 
     def admin_promote_user(self, token, username, email):
         """ use to promote a user to admin """
 
-        self.promoted_user = {
-            'username': username,
-            'email': email
+        result = self.client.put(url_for('promote_user'), data=json.dumps(
+            dict(username=username, email=email)), content_type='application/json', headers=({"app-access-token": token}))
+
+        result_data = json.loads(result.data.decode())
+        response = {
+            "message": result_data['message'],
+            "status_code": result.status_code
         }
-        return self.client.put(url_for('promote_user'), data=json.dumps(
-            self.promoted_user), content_type='application/json', headers=({"app-access-token": token}))
+        return response
 
-    def admin_approve_request(self, token, status, requestId):
-        """ use to approve a user's request """
+    def admin_manage_request(self, token, status, requestId):
+        """ use to approve, resolve, disapprove a user's request """
 
-        return self.client.put(url_for('approve_request', requestId=requestId), data=json.dumps(dict(status=status)), headers=({'app-access-token': token}), content_type='application/json')
+        result = self.client.put(url_for('manage_request', requestId=requestId), data=json.dumps(
+            dict(status=status)), headers=({'app-access-token': token}), content_type='application/json')
+
+        result_data = json.loads(result.data.decode())
+        response = {
+            "message": result_data['message'],
+            "status_code": result.status_code
+        }
+        return response

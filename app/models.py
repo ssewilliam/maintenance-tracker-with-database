@@ -70,9 +70,9 @@ class Requests(DatabaseConnection):
             return result
         return False
 
-    def update_request(self, user_id, r_type, r_title, r_description):
+    def update_request(self, user_id, requestId, r_type, r_title, r_description):
         result = self.update_record(self.__table__, "request_type = '"+r_type +
-                                    "', request_title = '"+r_title+"', request_body = '"+r_description+"'", " userid = "+user_id+"")
+                                    "', request_title = '"+r_title+"', request_body = '"+r_description+"'", " userid = "+user_id+" AND id = "+requestId+"")
         if result:
             return True
         return False
