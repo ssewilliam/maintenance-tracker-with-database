@@ -48,3 +48,9 @@ class Requests(DatabaseConnection):
         if result:
             return result
         return False
+
+    def fetch_requests(self,user_id):
+        result = self.fetch_all(self.__table__,"WHERE userid={}".format(user_id))
+        if result:
+            return result
+        return False

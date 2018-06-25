@@ -57,3 +57,9 @@ class BaseTestCase(unittest.TestCase):
         response = self.login_user("ssewilliam", "password")
         token_data = json.loads(response.data.decode())
         return token_data['token']
+
+    def get_requests(self,token):
+        """ use to get requests of logged in user by using a token """
+        
+        return self.client.get(
+            url_for('get_requests'), headers=({"app-access-token": token}))

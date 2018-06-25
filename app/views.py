@@ -159,3 +159,25 @@ def create_request(current_user):
     if result:
         return jsonify({'message': 'request created successfully'}), 201
     return jsonify({'message': 'creating request failed'}), 400
+
+
+@app.route("/api/v1/users/requests", methods=['GET'])
+@token_required
+def get_requests(current_user):
+    user_id = current_user[0]
+
+    _requests = Requests()
+    _requests = _requests.fetch_requests(user_id)
+
+    results = []
+    for _request in _requests:
+        this_request = {
+            'id': _request[0],
+            'type': _request[1],
+            'title': _request[2],
+            'description': _request[3]
+        }
+        results.append(this_request)
+    return jsonify({
+        'requests': results
+    }), 200
