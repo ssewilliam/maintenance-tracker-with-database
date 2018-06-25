@@ -103,7 +103,7 @@ def login():
         return jsonify({
             "message": "user doesnot exist"
         }), 404
-    pprint(user_data)
+    # pprint(user_data)
     if check_password_hash(user_data[3], auth.password):
         token = jwt.encode({'uid': user_data[0], 'exp': datetime.datetime.utcnow(
         ) + datetime.timedelta(minutes=1140)}, app.config['SECRET_KEY'])
@@ -196,11 +196,11 @@ def get_request(current_user, requestId):
         'type': _request[2],
         'title': _request[3],
         'description': _request[4],
-        'create date':_request[5]
+        'create date': _request[5]
     }
     return jsonify({
         'request': this_request,
-        'status':'OK'
+        'status': 'OK'
     }), 200
 
 
@@ -238,7 +238,104 @@ def put_request(current_user, requestId):
     result = _request.update_request(
         user_id, r_type, r_title, r_description)
 
-
     if result:
         return jsonify({'message': 'request updated successfully'}), 200
     return jsonify({'message': 'updating request failed'}), 400
+
+
+@app.route("/api/v1/users", methods=['PUT'])
+@token_required
+def promote_user(current_user):
+
+    if not request.json:
+        return jsonify({
+            "message": "request is invalid"
+        }), 400
+
+    field = request.get_json()
+    if 'username' not in request.json or field['username'] == "":
+        return jsonify({
+            "message": "username is invalid"
+        }), 400
+
+    if 'email' not in request.json or field['email'] == "":
+        return jsonify({
+            "message": "email is invalid"
+        }), 400
+
+    user = Users()
+    user_data = user.fetch_user(field['username'])
+    # pprint(user_data)
+    # pprint("user_data")
+    # pprint(user_data[0])
+    # admin_right = str(True)
+    user_id = str(user_data[0])
+    if user.modify_user(user_id):
+        return jsonify({
+            "message": "user promoted successfully",
+        }), 200
+
+    return jsonify({
+        "message": "user promoted failed",
+    }), 400
+
+
+@app.route("/api/v1/requests", methods=['GET'])
+@token_required
+def get_requests_admin(current_user):
+
+    is_admin = current_user[4]
+    if is_admin is False:
+        return jsonify({
+            "message": "operation requires admin rights"
+        }), 401
+
+    _requests = Requests()
+    total_results = _requests.fetch_all("requests")
+
+    request_list = []
+    for _request in total_results:
+        this_request = {
+            "id": _request[0],
+            "user id": _request[1],
+            "type": _request[2],
+            "title": _request[3],
+            "description": _request[4],
+        }
+        request_list.append(this_request)
+    return jsonify({
+        "requests": request_list
+    }), 200
+
+
+@app.route("/api/v1/requests/<requestId>", methods=['PUT'])
+@token_required
+def approve_request(current_user, requestId):
+    is_admin = current_user[4]
+    if is_admin is False:
+        return jsonify({
+            "message": "operation requires admin rights"
+        }), 401
+
+    _request = Requests()
+    if not _request.fetch_one("requests", "WHERE id = "+requestId+""):
+        return jsonify({
+            "message": "request doesnot exist"
+        }), 404
+
+    field = request.get_json()
+    if field['status'] not in ("approve", "resolve", "disapprove"):
+        return jsonify({
+            "message": "status not valid",
+            "help tip": "please use 'approve',resolve or disapprove"
+        }), 400
+
+    new_request = _request.update_record(
+        "requests", "status='"+field['status']+"'", "id="+requestId+"")
+    if new_request:
+        return jsonify({
+            "message": "request approved successfully"
+        }), 200
+    return jsonify({
+        "message": "request not approved"
+    }), 400

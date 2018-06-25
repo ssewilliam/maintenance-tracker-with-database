@@ -8,7 +8,7 @@ class TestRequest(BaseTestCase):
         self.register_user(
             "ssewilliam", "deriwilliams2008@gmail.com", "password")
         token = self.get_token()
-        response = self.post_request(token, "fix the login button", "reapir",
+        response = self.post_request(token, "fix the login button", "repair",
                                      "When you click the login button it only returns you to the same page")
         response_data = json.loads(response.data.decode())
         self.assertEqual(response_data['message'],
@@ -16,7 +16,7 @@ class TestRequest(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
         # trying to duplicate the request
-        response = self.post_request(token, "fix the login button", "reapir",
+        response = self.post_request(token, "fix the login button", "repair",
                                      "the button doesnot power off")
         response_data = json.loads(response.data.decode())
         self.assertEqual(response_data['message'],
@@ -25,11 +25,12 @@ class TestRequest(BaseTestCase):
 
     def test_user_can_get_requests(self):
         """ test if user can get created requests """
-        
+
         self.register_user(
             "ssewilliam", "deriwilliams2008@gmail.com", "password")
-        token = self.get_token()    
-        self.post_request(token, "fix the power button", "reapir","the laptop can turn on")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "repair", "the laptop can turn on")
         result = self.get_requests(token)
         self.assertEqual(result.status_code, 200)
 
@@ -40,9 +41,9 @@ class TestRequest(BaseTestCase):
             "ssewilliam", "deriwilliams2008@gmail.com", "password")
         token = self.get_token()
         self.post_request(token, "fix the power button",
-                          "reapir", "the laptop can turn on")
+                          "repair", "the laptop can turn on")
 
-        response = self.get_request(token,1)
+        response = self.get_request(token, 1)
 
         response_data = json.loads(response.data.decode())
         self.assertEqual(response_data['status'], 'OK')
@@ -55,8 +56,43 @@ class TestRequest(BaseTestCase):
             "ssewilliam", "deriwilliams2008@gmail.com", "password")
         token = self.get_token()
         self.post_request(token, "fix the power button",
-                          "reapir", "the laptop can turn on")
+                          "repair", "the laptop can turn on")
 
         result = self.update_request(
             token, 1, "fix the power button", "repair", "the laptop can turn on or off using this button")
-        self.assertEqual(result.status_code,200)
+        self.assertEqual(result.status_code, 200)
+
+    def test_admin_can_get_all_requests(self):
+        """ test admin can get all requests """
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "repair", "the laptop can turn on")
+        self.post_request(token, "fix the power button",
+                          "repair", "the laptop can turn on")
+
+        self.admin_promote_user(token, "ssewilliam",
+                                "deriwilliams2008@gmail.com")
+        result = self.admin_get_requests(token)
+        self.assertEqual(result.status_code, 200)
+
+    def test_admin_can_approve_request(self):
+        """ test if admin can approve a request """
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "repair", "the laptop can turn on")
+        self.admin_promote_user(token, "ssewilliam",
+                                "deriwilliams2008@gmail.com")
+        result = self.admin_approve_request(token,"approve",'1')
+        result_data = json.loads(result.data.decode())
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result_data['message'], "request approved successfully")
+
+
+
+    

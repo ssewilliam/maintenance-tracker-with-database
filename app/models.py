@@ -19,7 +19,7 @@ class Users(DatabaseConnection):
 
     def fetch_user(self, username):
         result = self.fetch_one(
-            self.__table__, "WHERE username='{}'".format(username))
+            self.__table__, "WHERE username='{}' OR email = '{}'".format(username,username))
         if result:
             return result
         return False
@@ -29,6 +29,13 @@ class Users(DatabaseConnection):
             self.__table__, "WHERE id={}".format(id))
         if result:
             return result
+        return False
+
+    def modify_user(self, user_id):
+        result = self.update_record(
+            self.__table__, "admin = True", " id = "+user_id+"")
+        if result:
+            return True
         return False
 
 
@@ -49,8 +56,9 @@ class Requests(DatabaseConnection):
             return result
         return False
 
-    def fetch_requests(self,user_id):
-        result = self.fetch_all(self.__table__,"WHERE userid={}".format(user_id))
+    def fetch_requests(self, user_id):
+        result = self.fetch_all(
+            self.__table__, "WHERE userid={}".format(user_id))
         if result:
             return result
         return False
@@ -64,7 +72,7 @@ class Requests(DatabaseConnection):
 
     def update_request(self, user_id, r_type, r_title, r_description):
         result = self.update_record(self.__table__, "request_type = '"+r_type +
-                                        "', request_title = '"+r_title+"', request_body = '"+r_description+"'"," userid = "+user_id+"")
+                                    "', request_title = '"+r_title+"', request_body = '"+r_description+"'", " userid = "+user_id+"")
         if result:
             return True
         return False

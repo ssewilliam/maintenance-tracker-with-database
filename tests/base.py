@@ -82,3 +82,23 @@ class BaseTestCase(unittest.TestCase):
         return self.client.put(
             url_for('put_request', requestId=requestId), data=json.dumps(self.request_data), content_type='application/json', headers=({"app-access-token": token}))
 
+    def admin_get_requests(self, token):
+        """ use to get requests for admin user by using a token """
+
+        return self.client.get(
+            url_for('get_requests_admin'), headers=({"app-access-token": token}))
+
+    def admin_promote_user(self, token, username, email):
+        """ use to promote a user to admin """
+
+        self.promoted_user = {
+            'username': username,
+            'email': email
+        }
+        return self.client.put(url_for('promote_user'), data=json.dumps(
+            self.promoted_user), content_type='application/json', headers=({"app-access-token": token}))
+
+    def admin_approve_request(self, token, status, requestId):
+        """ use to approve a user's request """
+
+        return self.client.put(url_for('approve_request', requestId=requestId), data=json.dumps(dict(status=status)), headers=({'app-access-token': token}), content_type='application/json')

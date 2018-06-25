@@ -29,3 +29,15 @@ class TestUser(BaseTestCase):
         self.assertEqual(
             lg_response_data['message'], "user logged in successfully")
         self.assertEqual(lg_response.status_code, 200)
+
+    def test_can_promote_user_right(self):
+        """ test if user can be promoted to admin """
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        result = self.admin_promote_user(
+            token, "ssewilliam", "deriwilliams2008@gmail.com")
+        result_data = json.loads(result.data.decode())
+        self.assertEqual(result_data['message'], "user promoted successfully")
+        self.assertEqual(result.status_code, 200)

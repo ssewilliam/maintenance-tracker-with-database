@@ -11,13 +11,13 @@ class DatabaseConnection:
             self.connection = psycopg2.connect(self.database_url)
             self.connection.autocommit = True
             self.cursor = self.connection.cursor()
-            pprint("Database connection successfully")
+            # pprint("Database connection successfully")
         except:
             pprint("Database connection failed")
 
     def create_tables(self):
         users_table = "CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY,username varchar(50), email varchar(500), password varchar(500),admin bool)"
-        request_table = "CREATE TABLE IF NOT EXISTS requests (id serial PRIMARY KEY, userid int, request_type varchar(25),request_title varchar(500), request_body varchar(500), request_date varchar(50))"
+        request_table = "CREATE TABLE IF NOT EXISTS requests (id serial PRIMARY KEY, userid int, request_type varchar(25),request_title varchar(500), request_body varchar(500), request_date varchar(50),status varchar(25))"
         self.cursor.execute(users_table)
         self.cursor.execute(request_table)
         # pprint("Tables created successfully")
@@ -57,6 +57,7 @@ class DatabaseConnection:
     def update_record(self, table, *args):
         update_query = "UPDATE {} SET {} WHERE {}".format(
             table, args[0], args[1])
+        # pprint(update_query)
         if self.cursor.execute(update_query) is None:
             return True
         return False
