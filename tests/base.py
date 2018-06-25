@@ -30,6 +30,7 @@ class BaseTestCase(unittest.TestCase):
 
     def login_user(self, username, password):
         """ use to login registered users """
+
         self.demo_user = {
             'username': username,
             'password': password
@@ -38,7 +39,7 @@ class BaseTestCase(unittest.TestCase):
         return self.client.post(
             url_for('login'), data=json.dumps(self.demo_user),  headers={'Authorization': 'Basic c3Nld2lsbGlhbTpwYXNzd29yZA =='})
 
-    def post(self, token, r_title, r_type, r_body):
+    def post_request(self, token, r_title, r_type, r_body):
         """ use to post a request for alogged in user """
 
         self.request_data = {
@@ -48,7 +49,7 @@ class BaseTestCase(unittest.TestCase):
         }
 
         return self.client.post(
-            url_for('create_request'), data=json.dumps(self.request_data), content_type='application/json', headers=({"token": token}))
+            url_for('create_request'), data=json.dumps(self.request_data), content_type='application/json', headers=({"app-access-token": token}))
 
     def get_token(self):
         """ use to get token after login """

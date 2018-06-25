@@ -24,12 +24,27 @@ class Users(DatabaseConnection):
             return result
         return False
 
+    def fetch_user_by_id(self, id):
+        result = self.fetch_one(
+            self.__table__, "WHERE id={}".format(id))
+        if result:
+            return result
+        return False
+
+
 class Requests(DatabaseConnection):
     __table__ = "requests"
 
-    def post_request(self, r_type, r_title, r_description, r_date):
-        result = self.insert_record(self.__table__, "(request_type, request_title, request_body, request_date)",
-                                    "('"+r_type+"', '"+r_title+"', '"+r_description+"', '"+r_date+"')")
+    def insert_request(self, user_id, r_type, r_title, r_description, r_date):
+        result = self.insert_record(self.__table__, "(userid, request_type, request_title, request_body, request_date)",
+                                    "('"+user_id+"','"+r_type+"', '"+r_title+"', '"+r_description+"', '"+r_date+"')")
         if result:
             return True
+        return False
+
+    def fetch_request(self, user_id, title):
+        result = self.fetch_one(
+            self.__table__, "WHERE userid={} AND request_title = '{}'".format(user_id, title))
+        if result:
+            return result
         return False
