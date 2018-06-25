@@ -93,6 +93,36 @@ class TestRequest(BaseTestCase):
         self.assertEqual(result.status_code, 200)
         self.assertEqual(result_data['message'], "request approved successfully")
 
+    def test_admin_can_resolve_request(self):
+        """ test if admin can resolve a request """
 
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "repair", "the laptop can turn on")
+        self.admin_promote_user(token, "ssewilliam",
+                                "deriwilliams2008@gmail.com")
+        result = self.admin_approve_request(token, "resolve", '1')
+        result_data = json.loads(result.data.decode())
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result_data['message'],
+                         "request resolved successfully")
+
+    def test_admin_can_disapprove_request(self):
+        """ test if admin can disapprove a request """
+
+        self.register_user(
+            "ssewilliam", "deriwilliams2008@gmail.com", "password")
+        token = self.get_token()
+        self.post_request(token, "fix the power button",
+                          "repair", "the laptop can turn on")
+        self.admin_promote_user(token, "ssewilliam",
+                                "deriwilliams2008@gmail.com")
+        result = self.admin_approve_request(token, "disapprove", '1')
+        result_data = json.loads(result.data.decode())
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result_data['message'],
+                         "request disapproved successfully")
 
     

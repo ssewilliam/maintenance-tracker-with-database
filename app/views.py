@@ -334,8 +334,8 @@ def approve_request(current_user, requestId):
         "requests", "status='"+field['status']+"'", "id="+requestId+"")
     if new_request:
         return jsonify({
-            "message": "request approved successfully"
+            "message": "request "+field['status']+"d successfully"
         }), 200
     return jsonify({
-        "message": "request not approved"
+        "message": "request not "+field['status'] + "d"
     }), 400
