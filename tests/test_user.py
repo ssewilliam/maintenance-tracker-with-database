@@ -12,7 +12,7 @@ class TestUser(BaseTestCase):
             reg_response_data['message'], "user registred successfully")
         self.assertEqual(reg_response.status_code, 201)
 
-        """ test whether a user can duplicate their registration """
+        #test whether a user can duplicate their registration
         dub_response = self.register_user(
             "angela", "angela.katumwa@gmail.com", "password")
         dub_response_data = json.loads(dub_response.data.decode())
@@ -28,6 +28,21 @@ class TestUser(BaseTestCase):
         self.assertEqual(
             lg_response_data['message'], "user logged in successfully")
         self.assertEqual(lg_response.status_code, 200)
+
+    def test_unknown_user_login(self):
+        """ test un registered user can login """
+
+        self.unknown_demo_user = {
+            "username":"ssembuusi",
+            "password":"another password"
+        }
+        lg_response = self.client.post(
+            url_for('login'), data=json.dumps(self.unknown_demo_user),  headers={'Authorization': 'Basic c3NlbWJ1dXNpOnBhc3N3b3Jk'})
+        lg_response_data = json.loads(lg_response.data.decode())
+
+        self.assertEqual(
+            lg_response_data['message'], "unknown user name or password")
+        self.assertEqual(lg_response.status_code, 401)
 
     def test_can_promote_user_right(self):
         """ test if user can be promoted to admin """

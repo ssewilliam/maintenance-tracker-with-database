@@ -39,6 +39,7 @@ class DatabaseConnection:
 
     def fetch_one(self, table, condition="ORDER BY id DESC"):
         select_query = "SELECT * FROM {} {}".format(table, condition)
+        pprint(select_query)
         self.cursor.execute(select_query)
         total_results = self.cursor.fetchone()
         if total_results:

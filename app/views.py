@@ -99,11 +99,11 @@ def login():
 
     user = Users()
     user_data = user.fetch_user(auth.username)
-    if not user:
+    if not user_data:
         return jsonify({
-            "message": "user doesnot exist"
-        }), 404
-    # pprint(user_data)
+            "message": "unknown user name or password"
+        }), 401
+
     if check_password_hash(user_data[3], auth.password):
         token = jwt.encode({'uid': user_data[0], 'exp': datetime.datetime.utcnow(
         ) + datetime.timedelta(minutes=1140)}, app.config['SECRET_KEY'])
@@ -173,9 +173,9 @@ def get_requests(current_user):
     for _request in _requests:
         this_request = {
             'id': _request[0],
-            'type': _request[1],
-            'title': _request[2],
-            'description': _request[3]
+            'type': _request[2],
+            'title': _request[3],
+            'description': _request[4]
         }
         results.append(this_request)
     return jsonify({
@@ -193,8 +193,14 @@ def get_request(current_user, requestId):
     _request = Requests()
     _request = _request.fetch_request_by_id(user_id, requestId)
 
+    if not _request:
+        return jsonify({
+            'status': 'unkown request id',
+            'message': 'request does not exist'
+        }), 404
+
     this_request = {
-        'id': _request[1],
+        'id': _request[0],
         'type': _request[2],
         'title': _request[3],
         'description': _request[4],
@@ -210,6 +216,7 @@ def get_request(current_user, requestId):
 @app.route("/api/v1/users/requests/<int:requestId>", methods=['PUT'])
 @token_required
 def put_request(current_user, requestId):
+
     if not request.json:
         return jsonify({
             "message": "request is invalid"
@@ -237,7 +244,20 @@ def put_request(current_user, requestId):
     # r_date = str(datetime.datetime.utcnow())
     user_id = str(current_user[0])
     requestId = str(requestId)
+    
     _request = Requests()
+    request_data = _request.fetch_request_by_id(user_id, requestId)
+
+    current_status = request_data[6]
+    if current_status == None:
+        return jsonify({'message': 'request not yet approved'}), 400
+
+    if current_status == "resolved":
+        return jsonify({'message': 'request already resolved'}), 400
+
+    if current_status == "disapproved":
+        return jsonify({'message': 'can not update disapproved request'}), 400
+
     result = _request.update_request(
         user_id, requestId, r_type, r_title, r_description)
 
@@ -337,7 +357,8 @@ def manage_request(current_user, requestId):
         }), 400
 
     new_request = _request.update_record(
-        "requests", "status='"+field['status']+"'", "id="+requestId+"")
+        "requests", "status='"+field['status']+"d'", "id="+requestId+"")
+
     if new_request:
         return jsonify({
             "message": "request "+field['status']+"d successfully"
@@ -345,3 +366,31 @@ def manage_request(current_user, requestId):
     return jsonify({
         "message": "request not "+field['status'] + "d"
     }), 400
+
+
+@app.route("/api/server-down",methods=['POST'])
+def under_maintenance():
+    abort(500)
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return jsonify({
+        'message': 'method used is invalid',
+        'status': 'FAILED'
+    }), 405
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return jsonify({
+        'message': 'this page doesnot exist',
+        'status': 'FAIL'
+    }), 404
+
+
+@app.errorhandler(500)
+def server_down(e):
+    return jsonify({
+        'message': 'server is under maintenance and unable to process your request',
+        'status': 'SERVER DOWN'
+    }), 500

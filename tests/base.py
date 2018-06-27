@@ -56,6 +56,7 @@ class BaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         db.drop_tables()
+        # pass
 
     def register_user(self, username, email, password):
         """ use to register a demo user """
