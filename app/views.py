@@ -2,7 +2,6 @@ from app import *
 from app.models import Users, Requests
 from pprint import pprint
 
-
 def token_required(func):
     @wraps(func)
     def decorated(*args, **kwargs):
@@ -147,6 +146,21 @@ def create_request(current_user):
     r_date = str(datetime.datetime.utcnow())
     user_id = str(current_user[0])
 
+    if re.compile("[~!@#$%^&*()-_=+}{]").search(r_title) or r_title =="":
+        return jsonify({
+            "message":"request title is not valid"
+        }),400
+
+    if re.compile("[~!@#$%^&*()-_=+}{]").search(r_type) or r_type == "":
+        return jsonify({
+            "message":"request type is not valid"
+        }),400
+
+    if r_type not in ("repair","maintenance"):
+        return jsonify({
+            "message":"request type is not valid use reapir or maintanance"
+        }),400
+
     _request = Requests()
     if _request.fetch_request(user_id, r_title):
         return jsonify({
@@ -169,13 +183,19 @@ def get_requests(current_user):
     _requests = Requests()
     _requests = _requests.fetch_requests(user_id)
 
+    if _requests is False:
+        return jsonify({
+            "message":"you have no requests"
+        }), 404
+
     results = []
     for _request in _requests:
         this_request = {
             'id': _request[0],
             'type': _request[2],
             'title': _request[3],
-            'description': _request[4]
+            'description': _request[4],
+            'status': _request[6]
         }
         results.append(this_request)
     return jsonify({
@@ -241,15 +261,30 @@ def put_request(current_user, requestId):
     r_type = field['type']
     r_title = field['title']
     r_description = field['description']
-    # r_date = str(datetime.datetime.utcnow())
     user_id = str(current_user[0])
     requestId = str(requestId)
     
+    if re.compile("[~!@#$%^&*()-_=+}{]").search(r_title) or r_title =="":
+        return jsonify({
+        "message":"request title is not valid"
+    }),400
+
+    if re.compile("[~!@#$%^&*()-_=+}{]").search(r_type) or r_type == "":
+        return jsonify({
+            "message":"request type is not valid"
+        }),400
+
+    if r_type not in ("repair","maintenance"):
+        return jsonify({
+            "message":"request type is not valid use reapir or maintanance"
+        }),400
+
+
     _request = Requests()
     request_data = _request.fetch_request_by_id(user_id, requestId)
 
     current_status = request_data[6]
-    if current_status == None:
+    if current_status == "pending":
         return jsonify({'message': 'request not yet approved'}), 400
 
     if current_status == "resolved":

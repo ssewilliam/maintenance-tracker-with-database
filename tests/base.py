@@ -1,7 +1,6 @@
 import json
 import unittest
 from flask import Flask
-from pprint import pprint
 from app import app, datetime
 
 app.config.from_object('config.DevelopmentConfig')
@@ -110,9 +109,11 @@ class BaseTestCase(unittest.TestCase):
 
         response = {
             "message": result_data['message'],
-            "status": result_data['status'],
             "status_code": result.status_code
         }
+
+        if 'status' in result_data.keys():
+            response['status'] = result_data['status']
         return response
 
     def get_request(self, token, requestId):
@@ -124,9 +125,10 @@ class BaseTestCase(unittest.TestCase):
         
         response = {
             "message":result_data['message'],
-            "status":result_data['status'],
             "status_code":result.status_code
         }
+        if 'status' in result_data.keys():
+            response['status'] = result_data['status']
         return response
 
     def update_request(self, token, requestId, r_title, r_type, r_body):
