@@ -1,0 +1,24 @@
+language: python
+python:
+  - "3.5.3"
+  
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install python-coveralls  # Install python-coveralls  
+  - pip install coverage       # Install coverage.py
+  - pip install nose           # Install nose
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c "create database trackerdb;" -U postgres
+  
+  
+# command to run tests
+script: 
+  - nosetests --with-coverage # Run nose with coverage support.
+  
+after_success:
+  - coveralls                     # Upload reports to coveralls.io
