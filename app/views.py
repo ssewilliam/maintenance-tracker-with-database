@@ -77,13 +77,13 @@ def login():
     if not auth:
         return jsonify({
             'message': 'Could not verify user',
-            'WWW-Authenticate': 'Basic realm="Login required"'
+            'WWW-Authenticate': "Basic realm='Login required'"
         }), 401
 
     if not auth.username or not auth.password:
         return jsonify({
             'message': 'Could not verify user',
-            'WWW-Authenticate': 'Basic realm="Login required"'
+            'WWW-Authenticate': "Basic realm='Login required'"
         }), 401
 
     if auth.username == "":
@@ -323,6 +323,12 @@ def promote_user(current_user):
 
     user = Users()
     user_data = user.fetch_user(field['username'])
+    if not user_data:
+        
+        return jsonify({
+            "message":"user doesnot exist"
+        }),404
+
     user_id = str(user_data[0])
 
     if user.modify_user(user_id):
