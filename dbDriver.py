@@ -7,12 +7,12 @@ class DatabaseConnection:
     database_url = app.config['DATABASE_URL']
 
     def __init__(self):
-        try:
+        # try:
             self.connection = psycopg2.connect(self.database_url)
             self.connection.autocommit = True
             self.cursor = self.connection.cursor()
-        except Exception as error:
-            pprint(error)
+        # except Exception as error:
+        #     pprint(error)
 
     def create_tables(self):
         users_table = "CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY,username varchar(50), email varchar(500), password varchar(500),admin bool)"
