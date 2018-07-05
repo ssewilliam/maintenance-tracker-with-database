@@ -1,0 +1,315 @@
+FORMAT: 1A
+HOST: http://maintenancetrackerapi1.apiblueprint.org/
+
+# Maintenance-tracker-api
+
+Maintenance Tracker App is an application that provides users with the ability to reach out to operations or repairs department regarding repair or maintenance requests and monitor the status of their request.
+
+### Register as new User [POST /api/v1/auth/signup]
+
+A user can register for an account.I takes a JSON object containing a username,email and a password
+
++ Response 400 (application/json)
+    + Body
+    + Attributes(invalidRequest)
+
+
++ Request (application/json)   
+    + Body
+    + Attributes(UserOne)  
+
++ Response 201 (application/json)
+    + Body
+    + Attributes(registrationSuccess)    
+
+
++ Request (application/json)
+    + Body
+    + Attributes(UserOne)   
+
++ Response 409 (application/json)
+    + Body
+    + Attributes(registrationFailed)
+
+
++ Request (application/json)
+    + Body
+    + Attributes(UserTwo)
+    
++ Response 201 (application/json)
+    + Body
+    + Attributes(registrationSuccess)
+
+### Login as a User [POST /api/v1/auth/login]
+
+A user can login using their credentials and get a token to use when making requests
+
++ Response 401
+
++ Request
+    
+    + Headers
+            
+            Authorization: Basic c3Nld2lsbGlhbTp1c2VycGFzc3dvcmQ=
+    
+    + Attributes(UserOne)            
+
++ Response 200 (application/json)
+    + Body
+    + Attributes(loginSuccess) 
+
+### Promote User to Admin [PUT /api/v1/users]
+
+A user can get promoted to admin level.It requires a username and email of the user
+
++ Response 401
++ Attributes (noToken)
+
++ Request
+
+    + Headers
+
+            Content-Type : application/json
+            app-access-token : eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEsImV4cCI6MTUzMDQxMzk2NX0.fSu1jwWMnm4CZIdsCQ15PJG8xSRgA0j5HjLQ-EnzqiE
+
+    + Body        
+    + Attributes (promoteUser)
+
++ Response 200 (application/json)
+
+        {
+            "message": "user promoted successfully"
+        }
+
+## Token Protected Requests [/api/v1/users/requests]
+
+### Create a New Request [POST]
+
+users can create their own requests using this action.It takes a JSON object containing a request type, title and description
+
++ Response 401  
++ Attributes(noToken)
+          
++ Request 
+
+    + Headers
+            
+            Content-Type: application/json
+            app-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIsImV4cCI6MTUzMDQxMzg5M30.4r9Yp0KlZ4TQxz35B-dvrOMm4nkrO9AB9jJzDCgNanY
+
+    + Body
+    + Attributes(newRequest)   
+
++ Response 201 (application/json)
++ Attributes(requestCreated)
+
+### List all Requests of a User [GET]
+
+Gets the list of requests made by users
+
++ Response 401
++ Attributes(noToken)
+
++ Request
+
+    + Headers
+            
+            app-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIsImV4cCI6MTUzMDQxMzg5M30.4r9Yp0KlZ4TQxz35B-dvrOMm4nkrO9AB9jJzDCgNanY
+
++ Response 200 (application/json)
++ Attributes(Requests)
+
+## Request of a User [/api/v1/users/requests/{id}]
+
++ Parameters
+    + id (required, number, `1`) - Id of the request
+
+### List one request [GET]
+
+Get the request using the request id as a parameter
+    
++ Response 401 
++ Attributes (noToken)
+
++ Request 
+    
+    + Headers
+
+            app-access-token : eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIsImV4cCI6MTUzMDQxMzg5M30.4r9Yp0KlZ4TQxz35B-dvrOMm4nkrO9AB9jJzDCgNanY
+
++ Response 200 (application/json)     
++ Attributes (singleRequest)
+
+### Modify an un approved request [PUT]
+
+A user can update his / her request using the request id as aparameter
+
++ Response 401 
++ Attributes (noToken)
+
++ Request 
+    
+    + Headers
+            
+            Content-Type : application/json
+            app-access-token : eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIsImV4cCI6MTUzMDQxMzg5M30.4r9Yp0KlZ4TQxz35B-dvrOMm4nkrO9AB9jJzDCgNanY
+
+    + Body
+    + Attributes(updateRequest)
+
++ Response 400 (application/json)     
+
+        {
+            "message" : "request not yet approved"
+        }
+
+## Admin operations on Requests [/api/v1/requests/{id}]
+
+### Modify a user Request [PUT]
+
+Update a user's request to approve, resolve or disapprove status.
+It takes a JSON object containing a status
+
++ Parameters
+    + id (required, number, `1`) - Id of the request
+
++ Response 401
++ Attributes(noToken)
+
++ Request 
+    
+    + Headers
+    
+            Content-Type: application/json
+            app-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjIsImV4cCI6MTUzMDQxMzg5M30.4r9Yp0KlZ4TQxz35B-dvrOMm4nkrO9AB9jJzDCgNanY
+    
+    + Attributes
+    
+        + status: approve (string) - new status of the request
+
++ Response 401 (application/json)
+    
+        {
+            "message": "operation requires admin rights"
+        }
+
++ Request 
+    
+    + Headers
+
+            Content-Type: application/json
+            app-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEsImV4cCI6MTUzMDQxMzk2NX0.fSu1jwWMnm4CZIdsCQ15PJG8xSRgA0j5HjLQ-EnzqiE
+    
+    + Attributes
+    
+        + status: approve (string) - new status of the request
+
++ Response 200 (application/json)
+    
+        {
+            "message": "request approved successfully"
+        }
+        
++ Request 
+    
+    + Headers
+
+            Content-Type: application/json
+            app-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEsImV4cCI6MTUzMDQxMzk2NX0.fSu1jwWMnm4CZIdsCQ15PJG8xSRgA0j5HjLQ-EnzqiE
+    
+    + Attributes
+    
+        + status: disapprove (string) - new status of the request
+
++ Response 200 (application/json)
+    
+        {
+            "message": "request disapproved successfully"
+        }       
+
++ Request 
+    
+    + Headers
+
+            Content-Type: application/json
+            app-access-token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEsImV4cCI6MTUzMDQxMzk2NX0.fSu1jwWMnm4CZIdsCQ15PJG8xSRgA0j5HjLQ-EnzqiE
+    
+    + Attributes
+    
+        + status: resolve (string) - new status of the request
+
++ Response 200 (application/json)
+    
+        {
+            "message": "request resolved successfully"
+        }
+        
+### Data Structures
+
+# noToken
++ message : token is missing (string,fixed)
+
+# UserOne
++ username: ssewilliam (string, required) - username of the user
++ email: deriwilliams2008@gmail.com (string, required) - email of the user
++ password: userpassword (string,required) - user password
+
+# UserTwo
++ username: maggie (string, required) - username of the user
++ email: maggieicon@gmail.com (string, required) - email of the user
++ password: userpasswords (string,required) - user password
+
+# registrationSuccess
++ message: user registred successfully (string, required)
+
+# registrationFailed
++ message: user already registered (string)
+
+# loginSuccess
+message: user logged in successfully (string, required)
+token: `eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjEsImV4cCI6MTUzMDQwNTkxMX0._WdWMVIOx20YVm77Ak1syTiTOYwk-bkqTGlSB2X123A` (string,optional) - token returned after login
+
+# promoteUser
++ username: ssewilliam (string, required) - username of the user
++ email: deriwilliams2008@gmail.com (string, required) - email of the user
+
+# invalidRequest        
++ message: invalid requestsde (string)        
+
+# newRequest
+    
++ title : fix the screen color (string, required) - short and brief heading
++ type : repair (string, required) - request type repair or maintenance
++ description : The screen has turned to black and white, no color at al (string, required) - Brief description about request
+
+# updateRequest
+    
++ title : fix the screen color (string, required) - short and brief heading
++ type : repair (string, required) - request type repair or maintenance
++ description : I need a new screen (string, required) - Brief description about request
+
+# requestCreated
++ message: Request created successfully (string)
+
+# singleRequest
+
++ message: returned successfully (string) - message of the requests
++ request
+    + create date : 2018-06-29 15:12:07.118936 (string) - date created  
+    + description : users can not login from here using the button (string) - Brief description about request
+    + id : 1 (number, required) - id of the request fetched
+    + title : fix the login button (string, required) - short and brief heading
+    + type : repair (string, required) - request type repair or maintenance
++ status : OK (string) - status of the requests
+
+
+# Requests
+
++ message: returned successfully (string) - message of the request
++ requests
+    + description : The screen has turned to black and white, no color at all
+    + id : 6
+    + status : pending (string)
+    + title : fix the screen color (string) - short and brief heading
+    + type : repair (string) - request type repair or maintenance
++ status : OK (string,fixed,required) - status of the requests
