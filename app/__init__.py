@@ -4,6 +4,8 @@ import jwt
 import re
 from functools import wraps
 import datetime
+from flask_cors import CORS, cross_origin
 app = Flask(__name__)
+CORS(app)
 
 app.config.from_object('config.ProductionConfig')

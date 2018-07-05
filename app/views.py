@@ -1,6 +1,5 @@
 from app import *
 from app.models import Users, Requests
-from pprint import pprint
 
 def token_required(func):
     @wraps(func)
@@ -263,7 +262,7 @@ def put_request(current_user, requestId):
     r_description = field['description']
     user_id = str(current_user[0])
     requestId = str(requestId)
-    
+
     if re.compile("[~!@#$%^&*()-_=+}{]").search(r_title) or r_title =="":
         return jsonify({
         "message":"request title is not valid"
@@ -324,7 +323,7 @@ def promote_user(current_user):
     user = Users()
     user_data = user.fetch_user(field['username'])
     if not user_data:
-        
+
         return jsonify({
             "message":"user doesnot exist"
         }),404
