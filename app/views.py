@@ -326,23 +326,23 @@ def promote_user():
         }), 400
 
     field = request.get_json()
-    if 'username' not in request.json or field['username'] == "":
+    if 'promoUsername' not in request.json or field['promoUsername'] == "":
         return jsonify({
             "message": "username is invalid"
         }), 400
 
-    if 'email' not in request.json or field['email'] == "":
+    if 'promoEmail' not in request.json or field['promoEmail'] == "":
         return jsonify({
             "message": "email is invalid"
         }), 400
 
     user = Users()
-    user_data = user.fetch_user(field['username'])
+    user_data = user.fetch_user_with_email(field['promoUsername'],field['promoEmail'])
     if not user_data:
 
         return jsonify({
-            "message":"user doesnot exist"
-        }),404
+            "message":"user does not exist"
+        }),400
 
     user_id = str(user_data[0])
 
@@ -352,7 +352,7 @@ def promote_user():
         }), 200
 
     return jsonify({
-        "message": "user promoted failed",
+        "message": "user promotion failed",
     }), 400
 
 

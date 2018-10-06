@@ -24,6 +24,13 @@ class Users(DatabaseConnection):
             return result
         return False
 
+    def fetch_user_with_email(self, username, email):
+        result = self.fetch_one(
+            self.__table__, "WHERE username='{}' AND email = '{}'".format(username,email))
+        if result:
+            return result
+        return False
+
     def fetch_user_by_id(self, id):
         result = self.fetch_one(
             self.__table__, "WHERE id={}".format(id))
