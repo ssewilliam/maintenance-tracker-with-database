@@ -318,7 +318,7 @@ def put_request(current_user, requestId):
 
 
 @app.route("/api/v1/users", methods=['PUT'])
-def promote_user(current_user):
+def promote_user():
 
     if not request.json:
         return jsonify({
