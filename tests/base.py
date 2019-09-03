@@ -3,7 +3,7 @@ import unittest
 from flask import Flask
 from app import app, datetime
 
-app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.TestingConfig')
 
 from app.views import *
 from dbDriver import db
@@ -76,7 +76,8 @@ class BaseTestCase(unittest.TestCase):
 
     def post_request(self, token, r_title, r_type, r_body):
         """ use to post a request for alogged in user """
-
+        print('##################r_type#####')
+        print(r_type)
         self.request_data = {
             'title': r_title,
             'type': r_type,
@@ -168,7 +169,7 @@ class BaseTestCase(unittest.TestCase):
         """ use to promote a user to admin """
 
         result = self.client.put(url_for('promote_user'), data=json.dumps(
-            dict(username=username, email=email)), content_type='application/json', headers=({"app-access-token": token}))
+            dict(promoUsername=username,promoEmail=email)), content_type='application/json', headers=({"app-access-token": token}))
 
         result_data = json.loads(result.data.decode())
         response = {

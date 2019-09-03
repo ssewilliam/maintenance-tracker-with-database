@@ -15,7 +15,7 @@ before_script:
   - psql -c "create database trackerdb;" -U postgres
 
 script: 
-  - nosetests --with-coverage
+  - nosetests --with-coverage -v
   
 after_success:
   - coveralls
