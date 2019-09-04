@@ -17,7 +17,7 @@ class TestUser(BaseTestCase):
             "angela", "angela.katumwa@gmail.com", "password")
         dub_response_data = json.loads(dub_response.data.decode())
         self.assertEqual(
-            dub_response_data['message'], "user already registered")
+            dub_response_data['message'], "email already registered")
         self.assertEqual(dub_response.status_code, 409)
 
     def test_user_can_login(self):

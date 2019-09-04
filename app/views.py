@@ -6,8 +6,8 @@ def token_required(func):
     def decorated(*args, **kwargs):
         token = None
 
-        if 'token' in request.headers:
-            token = request.headers['token']
+        if 'app-access-token' in request.headers:
+            token = request.headers['app-access-token']
 
         if not token:
             return jsonify({

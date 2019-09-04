@@ -49,7 +49,7 @@ class TestRequest(BaseTestCase):
         response = self.post_request(self.token, "replace the laptop screen",
                                      "repairsds", "the laptop can turn on")
         self.assertEqual(response['message'],
-                         'request type is not valid use reapir or maintanance')
+                         'request type is not valid use repair or maintenance')
         self.assertEqual(response['status_code'], 400)
 
         # trying to create request with out request type
