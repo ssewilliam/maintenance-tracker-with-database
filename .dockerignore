@@ -15,3 +15,4 @@ travis.yml
 .coveragerc
 *.pyc
 __pycache__
+docker
