@@ -1,0 +1,33 @@
+version: '2.1'
+volumes:
+  tracker_db: {}
+services:
+  api_test:
+    build: 
+      context: ../../
+      dockerfile: docker/test/Dockerfile
+    volumes:
+      - ../../:/usr/tracker-app
+    ports:
+     - "5000:5000"
+    links:
+      - database
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - ../../.env
+    entrypoint:
+      - /usr/tracker-app/docker/test/entrypoint.sh      
+  database:
+    image: postgres:9.6-alpine
+    expose:
+      - '5432'
+    ports:
+      - '5433:5432'
+    env_file:
+      - ../../.env
+    volumes:
+      - tracker_db:/var/lib/postgresql/data
+    healthcheck: 
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
