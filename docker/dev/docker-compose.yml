@@ -3,7 +3,7 @@ volumes:
   tracker_db: {}
 services:
   api:
-    build: 
+    build:
       context: ../../
       dockerfile: docker/dev/Dockerfile
     volumes:
@@ -16,7 +16,7 @@ services:
       database:
         condition: service_healthy
     env_file:
-      - ../../.env    
+      - ../../.env
   database:
     image: postgres:9.6-alpine
     expose:
@@ -27,5 +27,5 @@ services:
       - ../../.env
     volumes:
       - tracker_db:/var/lib/postgresql/data
-    healthcheck: 
+    healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
