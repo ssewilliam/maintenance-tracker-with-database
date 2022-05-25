@@ -3,4 +3,4 @@ Flask-Cors==3.0.6
 gunicorn==19.8.1
 psycopg2==2.7.4
 psycopg2-binary==2.7.4
-PyJWT==1.6.4
+PyJWT==2.4.0
