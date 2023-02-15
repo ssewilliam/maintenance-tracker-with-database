@@ -4,3 +4,4 @@ gunicorn==19.8.1
 psycopg2==2.7.4
 psycopg2-binary==2.7.4
 PyJWT==1.6.4
+werkzeug>=2.2.3 # not directly required, pinned by Snyk to avoid a vulnerability
